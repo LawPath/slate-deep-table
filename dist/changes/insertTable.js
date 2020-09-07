@@ -42,7 +42,7 @@ function insertTable(opts, editor) {
   // editor.insertNodeByKey(tableParent.key, tableIndex, textBlock);
   // /* End testing add new paragraph underneath the table */
 
-  editor.insertBlock(textBlock);
+  editor.insertBlock(table);
   return done;
 }
 
