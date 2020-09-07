@@ -27,6 +27,8 @@ var _moveSelectionBy = _interopRequireDefault(require("./changes/moveSelectionBy
 
 var _toggleHeaders = _interopRequireDefault(require("./changes/toggleHeaders"));
 
+var _toggleBorders = _interopRequireDefault(require("./changes/toggleBorders"));
+
 var _TablePosition = _interopRequireDefault(require("./TablePosition"));
 
 var _onTab = _interopRequireDefault(require("./onTab"));
@@ -156,7 +158,8 @@ function EditTable(opts) {
       removeTable: bindEditor(_removeTable["default"]),
       moveTableSelection: bindEditor(_moveSelection["default"]),
       moveTableSelectionBy: bindEditor(_moveSelectionBy["default"]),
-      toggleTableHeaders: bindEditor(_toggleHeaders["default"])
+      toggleTableHeaders: bindEditor(_toggleHeaders["default"]),
+      toggleTableBorders: bindEditor(_toggleBorders["default"])
     }
   };
 } // attach top-level function to create serializer rules

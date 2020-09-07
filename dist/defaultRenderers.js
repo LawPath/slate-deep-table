@@ -9,6 +9,8 @@ var _react = _interopRequireDefault(require("react"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 /**
  * split rows into thead contens and body contents,
  * unless "headless" option is set
@@ -16,17 +18,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var splitHeader = function splitHeader(props) {
   var rows = props.children;
   var header = !props.node.get("data").get("headless");
-
-  if (!header || !rows || !rows.length || rows.length === 1) {
-    return {
-      header: null,
-      rows: rows
-    };
-  }
-
+  var border = !props.node.get("data").get("border");
   return {
-    header: rows[0],
-    rows: rows.slice(1)
+    header: null,
+    rows: rows,
+    border: border
   };
 };
 /**
@@ -42,20 +38,15 @@ var makeRenderers = function makeRenderers() {
       case "paragraph":
         return /*#__PURE__*/_react["default"].createElement("p", props.attributes, props.children);
 
-      case "heading":
-        return /*#__PURE__*/_react["default"].createElement("h1", props.attributes, props.children);
-
-      case "subheading":
-        return /*#__PURE__*/_react["default"].createElement("h2", props.attributes, props.children);
-
       case opts.typeTable:
         var _splitHeader = splitHeader(props),
             header = _splitHeader.header,
-            rows = _splitHeader.rows;
+            rows = _splitHeader.rows,
+            border = _splitHeader.border;
 
-        return /*#__PURE__*/_react["default"].createElement("div", null, /*#__PURE__*/_react["default"].createElement("h3", null, "This is the new build"), /*#__PURE__*/_react["default"].createElement("table", {
-          className: "doc-v3-table"
-        }, header && /*#__PURE__*/_react["default"].createElement("thead", props.attributes, header), /*#__PURE__*/_react["default"].createElement("tbody", props.attributes, rows)));
+        return /*#__PURE__*/_react["default"].createElement("table", _extends({
+          className: "doc-v3-table ".concat(border ? " border " : "null")
+        }, props.attributes), header && /*#__PURE__*/_react["default"].createElement("thead", props.attributes, header), /*#__PURE__*/_react["default"].createElement("tbody", props.attributes, rows));
 
       case opts.typeRow:
         return /*#__PURE__*/_react["default"].createElement("tr", props.attributes, props.children);
