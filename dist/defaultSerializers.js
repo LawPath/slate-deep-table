@@ -9,7 +9,31 @@ var _react = _interopRequireDefault(require("react"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-// default rules to pass to slate's html serializer (see tests)
+var RADIO_INPUT_VALUE = "radioOptionsInput";
+
+var getRadioVariableMark = function getRadioVariableMark(node) {
+  var radioVariableInputs = [];
+  var firstNodeOfTheRow = node.nodes.size > 0 ? node.nodes.get(0) : null;
+
+  if (firstNodeOfTheRow) {
+    var texts = firstNodeOfTheRow.getTextsAsArray();
+    texts.forEach(function (text) {
+      text.marks.filter(function (mark) {
+        return mark.type === "variable";
+      }).forEach(function (mark) {
+        var variableMarkData = mark.data.get("variable");
+
+        if (variableMarkData && variableMarkData.type === RADIO_INPUT_VALUE) {
+          radioVariableInputs.push(variableMarkData);
+        }
+      });
+    });
+  }
+
+  return radioVariableInputs.length === 0 ? null : radioVariableInputs[0];
+}; // default rules to pass to slate's html serializer (see tests)
+
+
 var makeSerializerRules = function makeSerializerRules() {
   var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   opts.typeTable = opts.typeTable || "table";
@@ -19,7 +43,8 @@ var makeSerializerRules = function makeSerializerRules() {
   var TABLE_CHILD_TAGS = {
     tr: opts.typeRow,
     th: opts.typeCell,
-    td: opts.typeCell
+    td: opts.typeCell,
+    p: opts.paragraph
   };
   return [{
     serialize: function serialize(obj, children) {
@@ -40,6 +65,16 @@ var makeSerializerRules = function makeSerializerRules() {
             }, headers && /*#__PURE__*/_react["default"].createElement("thead", null, split.header), /*#__PURE__*/_react["default"].createElement("tbody", null, split.rows));
 
           case opts.typeRow:
+            var radioVariable = getRadioVariableMark(obj);
+
+            if (radioVariable) {
+              return /*#__PURE__*/_react["default"].createElement("tr", {
+                type: "condition",
+                equals: radioVariable.value,
+                id: radioVariable.name
+              }, children);
+            }
+
             return /*#__PURE__*/_react["default"].createElement("tr", null, children);
 
           case opts.typeCell:
@@ -80,11 +115,14 @@ var makeSerializerRules = function makeSerializerRules() {
       var type = TABLE_CHILD_TAGS[tag];
 
       if (type) {
+        var filteredChildNodes = Array.from(el.childNodes).filter(function (item, index) {
+          return index !== 0 || index === 0 && item.textContent.trim() !== "";
+        });
         return {
           object: "block",
           type: type,
           data: {},
-          nodes: next(el.childNodes)
+          nodes: next(filteredChildNodes)
         };
       }
     }

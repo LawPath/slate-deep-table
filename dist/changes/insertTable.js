@@ -30,19 +30,8 @@ function insertTable(opts, editor) {
     return "";
   };
 
-  var table = (0, _createTable["default"])(opts, columns, rows, fillWithEmptyText); // /* Start testing add new paragraph underneath the table */
-  // const done = editor.insertBlock(table);
-  // const tableParent = value.document.getParent(value.startBlock.key);
-  // const tableIndex = tableParent.nodes.indexOf(table);
-  // const textBlock = Block.create({
-  //   object: "block",
-  //   type: "paragraph",
-  //   nodes: [{ object: "text", text: "" }],
-  // });
-  // editor.insertNodeByKey(tableParent.key, tableIndex, textBlock);
-  // /* End testing add new paragraph underneath the table */
-
-  editor.insertBlock(table);
+  var table = (0, _createTable["default"])(opts, columns, rows, fillWithEmptyText);
+  var done = editor.insertBlock(table);
   return done;
 }
 

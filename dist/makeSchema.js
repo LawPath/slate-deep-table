@@ -60,9 +60,9 @@ function makeSchema(opts) {
 
       },
       nodes: [{
-        match: {
+        match: [{
           object: "block"
-        },
+        }],
         min: 1
       }],
       normalize: function normalize(editor, error) {
