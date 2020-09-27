@@ -7,32 +7,11 @@ exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
+var _deserialise = require("./utils/deserialise");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var RADIO_INPUT_VALUE = "radioOptionsInput";
-
-var getRadioVariableMark = function getRadioVariableMark(node) {
-  var radioVariableInputs = [];
-  var firstNodeOfTheRow = node.nodes.size > 0 ? node.nodes.get(0) : null;
-
-  if (firstNodeOfTheRow) {
-    var texts = firstNodeOfTheRow.getTextsAsArray();
-    texts.forEach(function (text) {
-      text.marks.filter(function (mark) {
-        return mark.type === "variable";
-      }).forEach(function (mark) {
-        var variableMarkData = mark.data.get("variable");
-
-        if (variableMarkData && variableMarkData.type === RADIO_INPUT_VALUE) {
-          radioVariableInputs.push(variableMarkData);
-        }
-      });
-    });
-  }
-
-  return radioVariableInputs.length === 0 ? null : radioVariableInputs[0];
-}; // default rules to pass to slate's html serializer (see tests)
-
+var TABLE = "table"; // default rules to pass to slate's html serializer (see tests)
 
 var makeSerializerRules = function makeSerializerRules() {
   var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -52,6 +31,7 @@ var makeSerializerRules = function makeSerializerRules() {
         switch (obj.type) {
           case opts.typeTable:
             var headers = !obj.data.get("headless");
+            var colGroups = !obj.data.get("colGroups");
             var rows = children;
             var split = !headers || !rows || !rows.size || rows.size === 1 ? {
               header: null,
@@ -62,10 +42,14 @@ var makeSerializerRules = function makeSerializerRules() {
             };
             return /*#__PURE__*/_react["default"].createElement("table", {
               className: "doc-v3-table"
-            }, headers && /*#__PURE__*/_react["default"].createElement("thead", null, split.header), /*#__PURE__*/_react["default"].createElement("tbody", null, split.rows));
+            }, colGroups ? /*#__PURE__*/_react["default"].createElement("colgroup", null, colGroups.forEach(function (col) {
+              return /*#__PURE__*/_react["default"].createElement("col", {
+                width: col
+              });
+            })) : null, headers && /*#__PURE__*/_react["default"].createElement("thead", null, split.header), /*#__PURE__*/_react["default"].createElement("tbody", null, split.rows));
 
           case opts.typeRow:
-            var radioVariable = getRadioVariableMark(obj);
+            var radioVariable = (0, _deserialise.getRadioVariableMark)(obj);
 
             if (radioVariable) {
               return /*#__PURE__*/_react["default"].createElement("tr", {
@@ -95,7 +79,7 @@ var makeSerializerRules = function makeSerializerRules() {
     deserialize: function deserialize(el, next) {
       var tag = el.tagName.toLowerCase();
 
-      if (tag === "table") {
+      if (tag === TABLE) {
         var data = {
           headless: true
         };
@@ -104,20 +88,33 @@ var makeSerializerRules = function makeSerializerRules() {
           data.headless = false;
         }
 
+        data.colGroups = (0, _deserialise.deserialiseColgroup)(el);
+        /* Deserialise the with of colgroup */
+
+        var tbodyNodes = (0, _deserialise.deserialiseTbody)(el);
         return {
           object: "block",
           type: opts.typeTable,
           data: data,
-          nodes: next(el.childNodes)
+          nodes: next(tbodyNodes)
         };
       }
 
       var type = TABLE_CHILD_TAGS[tag];
 
       if (type) {
-        var filteredChildNodes = Array.from(el.childNodes).filter(function (item, index) {
-          return index !== 0 || index === 0 && item.textContent.trim() !== "";
-        });
+        var filteredChildNodes;
+
+        if (type === opts.typeCell) {
+          /* Serrialise the content of the cell because it contains marks*/
+          filteredChildNodes = (0, _deserialise.deserialiseTableCell)(el);
+        } else {
+          /*else filter out empty child nodes  */
+          filteredChildNodes = Array.from(el.childNodes).filter(function (item, index) {
+            return index !== 0 || index === 0 && item.textContent.trim() !== "";
+          });
+        }
+
         return {
           object: "block",
           type: type,

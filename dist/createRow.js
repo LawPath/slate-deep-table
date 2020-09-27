@@ -28,7 +28,8 @@ function createRow(opts, columns, textGetter) {
 
   return _slate.Block.create({
     type: opts.typeRow,
-    nodes: cellNodes
+    nodes: cellNodes,
+    key: Date.now().toString()
   });
 }
 

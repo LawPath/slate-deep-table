@@ -29,6 +29,7 @@ function createTable(opts, columns, rows, textGetter) {
   return _slate.Block.create({
     type: opts.typeTable,
     nodes: rowNodes,
+    key: Date.now().toString(),
     data: {}
   });
 }

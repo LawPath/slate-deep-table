@@ -44,9 +44,14 @@ var makeRenderers = function makeRenderers() {
             rows = _splitHeader.rows,
             border = _splitHeader.border;
 
+        var colGroups = props.node.get("data").get("colGroups");
         return /*#__PURE__*/_react["default"].createElement("table", _extends({
           className: "doc-v3-table ".concat(border ? " border " : "null")
-        }, props.attributes), header && /*#__PURE__*/_react["default"].createElement("thead", props.attributes, header), /*#__PURE__*/_react["default"].createElement("tbody", props.attributes, rows));
+        }, props.attributes), colGroups ? /*#__PURE__*/_react["default"].createElement("colgroup", null, colGroups.map(function (col) {
+          return /*#__PURE__*/_react["default"].createElement("col", {
+            width: col
+          });
+        })) : null, header && /*#__PURE__*/_react["default"].createElement("thead", props.attributes, header), /*#__PURE__*/_react["default"].createElement("tbody", props.attributes, rows));
 
       case opts.typeRow:
         return /*#__PURE__*/_react["default"].createElement("tr", props.attributes, props.children);
