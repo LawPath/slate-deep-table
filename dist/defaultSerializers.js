@@ -31,7 +31,7 @@ var makeSerializerRules = function makeSerializerRules() {
         switch (obj.type) {
           case opts.typeTable:
             var headers = !obj.data.get("headless");
-            var colGroups = !obj.data.get("colGroups");
+            var colGroups = obj.data.get("colGroups");
             var rows = children;
             var split = !headers || !rows || !rows.size || rows.size === 1 ? {
               header: null,
